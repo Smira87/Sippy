@@ -1,9 +1,9 @@
 #!/usr/local/bin/python3
 
 import sys
-import os
-import re
 import sippyapi.db
+import ipaddress
+import subprocess
 from sippyapi.log.StderrLogger import StderrLogger
 from sippyapi.misc.ClusterConf import ClusterConf
 
@@ -11,28 +11,20 @@ from sippyapi.misc.ClusterConf import ClusterConf
 def insert_ip():
     sys.stdout.write("Please enter a new IP address:")
     sys.stdout.flush()
-    val = sys.stdin.readline().strip()
-    if val == "":
-        print("ERROR: empty IP")
-        insert_ip()
-    is_correct = bool(re.match('[0-9.]+$'  , val))
-    if not is_correct:
-        sys.stdout.write("ERROR: Not a valid IP ADDRESS! Check your input. ")
-        sys.stdout.flush()
+    try:
+        val = ipaddress.ip_address(sys.stdin.readline().strip())
+    except ValueError:
+        print("ERROR: IP address is not valid! ")
         val = insert_ip()
     return val
 
 def insert_mask():
     sys.stdout.write("Please enter a NETWORK MASK:")
     sys.stdout.flush()
-    val = sys.stdin.readline().strip()
-    if val == "":
-        print("ERROR: empty MASK")
-        insert_mask()
-    is_correct = bool(re.match('[0-9.]+$'  , val))
-    if not is_correct:
-        sys.stdout.write("ERROR: Not a valid MASK! Check your input. ")
-        sys.stdout.flush()
+    try:
+        val = ipaddress.ip_address(sys.stdin.readline().strip())
+    except ValueError:
+        print("ERROR: NETWORK MASK is not valid! ")
         val = insert_mask()
     return val
 
@@ -40,13 +32,10 @@ def insert_iface():
     sys.stdout.write("Please enter a NETWORK INTERFACE:")
     sys.stdout.flush()
     val = sys.stdin.readline().strip()
-    if val == "":
-        print("ERROR: empty MASK")
-        insert_iface()
-    is_correct = bool(re.match('[a-zA-Z0-9]+$'  , val))
-    if not is_correct:
-        sys.stdout.write("ERROR: Not a valid INTERFACE! Check your input. ")
-        sys.stdout.flush()
+    try:
+        result = subprocess.check_output(["ifconfig %s" % val], shell=True)
+    except:
+        print("ERROR: No such interface ")
         val = insert_iface()
     return val
 
@@ -72,4 +61,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
