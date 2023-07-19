@@ -8,44 +8,41 @@ from sippyapi.log.StderrLogger import StderrLogger
 from sippyapi.misc.ClusterConf import ClusterConf
 
 
-def insert_ip():
+def get_ip_and_mask():
     sys.stdout.write("Please enter a new IP address:")
     sys.stdout.flush()
     try:
-        val = ipaddress.ip_address(sys.stdin.readline().strip())
+        ip = ipaddress.ip_address(sys.stdin.readline().strip())
     except ValueError:
         print("ERROR: IP address is not valid! ")
-        val = insert_ip()
-    return val
-
-def insert_mask():
+        sys.exit()
     sys.stdout.write("Please enter a NETWORK MASK:")
     sys.stdout.flush()
+    mask =  sys.stdin.readline().strip()
     try:
-        val = ipaddress.ip_address(sys.stdin.readline().strip())
+        ipaddress.ip_network('%s/%s' % (ip, mask), False)
+
     except ValueError:
         print("ERROR: NETWORK MASK is not valid! ")
-        val = insert_mask()
-    return val
+        sys.exit()
+    return ip, mask
 
-def insert_iface():
+def get_iface():
     sys.stdout.write("Please enter a NETWORK INTERFACE:")
     sys.stdout.flush()
     val = sys.stdin.readline().strip()
     try:
-        result = subprocess.check_output(["ifconfig %s" % val], shell=True)
+        subprocess.check_output(["ifconfig %s" % val], shell=True)
     except:
         print("ERROR: No such interface ")
-        val = insert_iface()
+        sys.exit()
     return val
 
 def main():
 
-    ip = insert_ip()
-
-    mask = insert_mask()
-
-    iface = insert_iface()
+    ip_and_mask = get_ip_and_mask()
+    ip, mask = ip_and_mask[0], ip_and_mask[1]
+    iface = get_iface()
 
     with open('/SSP_ID') as f:
          node = f.readline().strip()
