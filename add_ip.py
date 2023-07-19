@@ -54,7 +54,9 @@ def main():
     root_dbconf.user = root_cl_conf.pgsql_user # Connect as superuser
     root_db = sippyapi.db.ConnectionWrapper(root_dbconf, autoreconnect = False)
 
-    root_db.execute("insert into net_addresses (name, description, i_environment, node, iface, ip, netmask, i_net, active) values ('new', 'new', '1', '%s' , '%s', '%s', '%s', '1', 't');" %(node, iface, ip, mask))
+    root_db.execute("insert into net_addresses (name, description, i_environment, node, "
+                    "iface, ip, netmask, i_net, active) values ('new', 'new', '1', '%s' "
+                    ", '%s', '%s', '%s', '1', 't');" %(node, iface, ip, mask))
 
 if __name__ == '__main__':
     main()
